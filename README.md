@@ -1,7 +1,27 @@
-# Cbuilder
+# cbuilder
 
-CSV builder inspired by dhh's excellent jbuilder. The goal is a simple DSL for
-creating CSV files that's better than creating massive custom arrays.
+cbuilder is a CSV builder inspired by dhh's excellent jbuilder. The goal is a
+simple DSL for creating CSV files that's better than creating massive custom arrays.
+
+Have you ever found yourself doing this?
+
+    Name,First,Last,Company,Address 1,...
+    <% @orders.each do |order|%>
+    <%= order.customer.name %>,<%= customer_firstname(order) %>,<%= customer_lastname(order) %>,...
+    <% end %>
+
+What if you could do this instead?
+
+    csv.name        order.customer.name
+    csv.first_name  customer_fullname(order)
+    csv.last_name   customer_lastname(order)
+    ...
+
+If you're doing any more than 4-5 columns, generating CSV files can be a real pain. 
+God forbid you're not simply outputting the attributes of a simple array, and need
+helpers or other niceties.
+
+cbuilder is here to make it easier.
 
 ## Installation
 
