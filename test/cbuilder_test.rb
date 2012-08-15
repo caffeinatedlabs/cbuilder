@@ -3,6 +3,6 @@ require 'active_support/test_case'
 
 require 'cbuilder'
 
-class JbuilderTest < ActiveSupport::TestCase
+class CbuilderTest < ActiveSupport::TestCase
 
 end
