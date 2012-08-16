@@ -2,6 +2,7 @@ require 'blankslate'
 require 'active_support/ordered_hash'
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/enumerable'
+require 'csv'
 
 class Cbuilder < BlankSlate
   #Yields a builder and automatically turns the result into a CSV file
@@ -44,11 +45,16 @@ class Cbuilder < BlankSlate
   
   # Encodes the current builder as CSV.
   def target!
-    #FasterCSV.generate @attributes
     if RUBY_VERSION > '1.9'
-      #Output with ruby's CSV
+      CSV.generate do |csv|
+        csv << @attributes.keys
+        csv << @attributes.values
+      end
     else
-      #Output with FasterCSV
+      FasterCSV.generate do |csv|
+        csv << @attributes.keys
+        csv << @attributes.values
+      end
     end
   end
 
@@ -65,7 +71,7 @@ class Cbuilder < BlankSlate
       # age, ...
       # 32, ...
       when args.length == 1
-        #todo: implement
+        set! method, args.first 
 
       # csv.comments { |csv| ... }
       # comments, ...
