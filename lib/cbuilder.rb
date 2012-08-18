@@ -6,8 +6,8 @@ require 'csv'
 
 class Cbuilder < BlankSlate
   #Yields a builder and automatically turns the result into a CSV file
-  def self.encode
-    new._tap { |cbuilder| yield cbuilder }.target!
+  def self.encode(collection = nil)
+    new._tap { |cbuilder| yield cbuilder }.target!(collection)
   end
 
   define_method(:__class__, find_hidden_method(:class))
@@ -33,11 +33,17 @@ class Cbuilder < BlankSlate
   end
   
   # Encodes the current builder as CSV.
-  def target!
+  def target!(collection = nil)
     if RUBY_VERSION > '1.9'
       CSV.generate do |csv|
         csv << @attributes.keys # header row
-        csv << @attributes.values 
+        if collection.nil?
+          csv << @attributes.values # body rows
+        else
+          collection.each do |element| # body rows
+            csv << _evaluate_for(element, @attributes.values)
+          end
+        end
       end
     else
       FasterCSV.generate do |csv|
@@ -50,12 +56,6 @@ class Cbuilder < BlankSlate
   private
     def method_missing(method, *args)
       case
-      # csv.comments @post.comments { |csv, comment| ... }
-      # comments, ...
-      # "comment1, comment2, ...", ...
-      when args.one? && block_given?
-        _yield_iteration(method, args.first) { |child, element| yield child, element }
- 
       # csv.age 32
       # age, ...
       # 32, ...
@@ -74,11 +74,6 @@ class Cbuilder < BlankSlate
       when args.length == 2 && args.first.is_a?(Enumerable)
         set! method, args.first.map {|a| a.send(args[1])}.join(", ")
 
-      # csv.author @post.creator, :name, :email_address
-      # author, ...
-      # "name: Nate, email: nate.berkopec@gmail.com", ...
-      when args.many?
-        # todo: implement
       end
     end
 
@@ -116,6 +111,10 @@ class Cbuilder < BlankSlate
     
     def _inline_extract(container, record, attributes)
       __send__(container) { |parent| parent.extract! record, *attributes }
+    end
+
+    def _evaluate_for(element, values)
+      values.map {|v| element.send(v)}
     end
 
 end

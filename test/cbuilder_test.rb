@@ -50,6 +50,19 @@ class CbuilderTest < ActiveSupport::TestCase
     assert_equal ["give you up"], CSV.parse(csv)[1]
   end
 
+  test "iterates over all values of a passed collection" do
+    comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
+
+    csv = Cbuilder.encode(comments) do |csv|
+      csv.id        :id
+      csv.content   :content
+    end
+    
+    assert_equal ["id", "content"], CSV.parse(csv)[0]
+    assert_equal ["1", "hello"], CSV.parse(csv)[1]
+    assert_equal ["2", "world"], CSV.parse(csv)[2]
+  end
+
   test "nesting multiple children from array" do
     comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
     
