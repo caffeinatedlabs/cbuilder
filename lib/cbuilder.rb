@@ -27,17 +27,6 @@ class Cbuilder < BlankSlate
     @attributes[column] = value
   end
 
-  if RUBY_VERSION > '1.9'
-    def call(*args)
-      case
-      when args.one?
-        array!(args.first) { |json, element| yield json, element }
-      when args.many?
-        extract!(*args)
-      end
-    end
-  end
-
   # Returns the attributes of the current builder.
   def attributes!
     @attributes
@@ -47,8 +36,8 @@ class Cbuilder < BlankSlate
   def target!
     if RUBY_VERSION > '1.9'
       CSV.generate do |csv|
-        csv << @attributes.keys
-        csv << @attributes.values
+        csv << @attributes.keys # header row
+        csv << @attributes.values 
       end
     else
       FasterCSV.generate do |csv|
@@ -65,8 +54,8 @@ class Cbuilder < BlankSlate
       # comments, ...
       # "comment1, comment2, ...", ...
       when args.one? && block_given?
-        # todo: implement
-
+        _yield_iteration(method, args.first) { |child, element| yield child, element }
+ 
       # csv.age 32
       # age, ...
       # 32, ...
@@ -79,11 +68,11 @@ class Cbuilder < BlankSlate
       when args.empty? && block_given?
         # todo: implement
       
-      # csv.comments(@post.comments, :content, :created_at)
+      # csv.comments @post.comments, :content
       # comments, ...
-      # "content: hello, created_at:, ...", ...
-      when args.many? && args.first.is_a?(Enumerable)
-        # todo: implement
+      # "hello, world", ...
+      when args.length == 2 && args.first.is_a?(Enumerable)
+        set! method, args.first.map {|a| a.send(args[1])}.join(", ")
 
       # csv.author @post.creator, :name, :email_address
       # author, ...

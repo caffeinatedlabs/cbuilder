@@ -28,4 +28,53 @@ class CbuilderTest < ActiveSupport::TestCase
     assert CSV.parse(csv)[0] == ["username"]
     assert_equal [], CSV.parse(csv)[1]
   end
+
+  test "multiple keys" do
+    csv = Cbuilder.encode do |csv|
+      csv.title "hello"
+      csv.content "world"
+    end
+    
+    CSV.parse(csv).tap do |parsed|
+      assert_equal ["title", "content"], parsed[0]
+      assert_equal ["hello", "world"], parsed[1]
+    end
+  end
+  
+  test "dynamically set a key/value" do
+    csv = Cbuilder.encode do |csv|
+      csv.set!("Never gonna", "give you up")
+    end
+    
+    assert_equal ["Never gonna"], CSV.parse(csv)[0]
+    assert_equal ["give you up"], CSV.parse(csv)[1]
+  end
+
+  test "nesting multiple children from array" do
+    comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
+    
+    csv = Cbuilder.encode do |csv|
+      csv.comments comments, :content
+    end
+    
+    CSV.parse(csv).tap do |parsed|
+      assert_equal ["comments"], parsed[0]
+      assert_equal "hello, world", parsed[1].first
+    end
+  end
+  
+  test "nesting multiple children from array when child array is empty" do
+    comments = []
+    
+    csv = Cbuilder.encode do |csv|
+      csv.name "Parent"
+      csv.comments comments, :content
+    end
+    
+    CSV.parse(csv).tap do |parsed|
+      assert_equal "Parent", parsed[1].first
+      assert_equal "", parsed[1].second
+    end
+  end
+
 end
