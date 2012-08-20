@@ -63,6 +63,19 @@ class CbuilderTest < ActiveSupport::TestCase
     assert_equal ["2", "world"], CSV.parse(csv)[2]
   end
 
+  test "with no arguments" do
+    comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
+
+    csv = Cbuilder.encode(comments) do |csv|
+      csv.id        
+      csv.content 
+    end
+    
+    assert_equal ["id", "content"], CSV.parse(csv)[0]
+    assert_equal ["1", "hello"], CSV.parse(csv)[1]
+    assert_equal ["2", "world"], CSV.parse(csv)[2]
+  end
+
   test "nesting multiple children from array" do
     comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
     
@@ -88,6 +101,37 @@ class CbuilderTest < ActiveSupport::TestCase
       assert_equal "Parent", parsed[1].first
       assert_equal "", parsed[1].second
     end
+  end
+
+  test "column sugar" do
+    comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
+
+    csv = Cbuilder.encode(comments) do |csv|
+      csv.column  "Comment ID", :id
+      csv.column  "Content",    :content
+    end
+    
+    assert_equal ["Comment ID", "Content"], CSV.parse(csv)[0]
+    assert_equal ["1", "hello"], CSV.parse(csv)[1]
+    assert_equal ["2", "world"], CSV.parse(csv)[2]
+  end
+
+  test "helper method integration" do
+    comments = [ Struct.new(:content, :id).new("hello", 1), Struct.new(:content, :id).new("world", 2) ]
+
+    def id_plus_one(comment)
+      comment.id + 1
+    end
+
+    csv = Cbuilder.encode(comments) do |csv|
+      csv.column  "Comment ID", id_plus_one
+      csv.column  "Content",    :content
+    end
+    
+    assert_equal ["Comment ID", "Content"], CSV.parse(csv)[0]
+    assert_equal ["2", "hello"], CSV.parse(csv)[1]
+    assert_equal ["3", "world"], CSV.parse(csv)[2]
+
   end
 
 end

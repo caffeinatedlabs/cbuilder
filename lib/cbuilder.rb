@@ -19,12 +19,20 @@ class Cbuilder < BlankSlate
 
   # Dynamically set a column/value pair. 
   # Example: 
-  # csv.set!(:username, "user")
-  # csv.set!(:password, "secret")
+  # csv.set!(:username, :name)
+  # csv.set!(:password)
   # username,password
   # user,secret
-  def set!(column, value = nil)
+  def set!(column, value)
     @attributes[column] = value
+  end
+
+  # sugary set method
+  # csv.column 'User Age' :age
+  # User Age, ...
+  # 32
+  def column(column, value)
+    set! column, value
   end
 
   # Returns the attributes of the current builder.
@@ -62,6 +70,13 @@ class Cbuilder < BlankSlate
       when args.length == 1
         set! method, args.first 
 
+      # person = {:age => 32}
+      # csv.age
+      # age, ...
+      # 32, ...
+      when args.length == 0
+        set! method, method
+
       # csv.comments { |csv| ... }
       # comments, ...
       # " ... ", ...
@@ -84,7 +99,7 @@ class Cbuilder < BlankSlate
     end
 
     def _yield_nesting(container)
-      set! container, _new_instance._tap { |jbuilder| yield jbuilder }.attributes!
+      set! container, _new_instance._tap { |cbuilder| yield cbuilder }.attributes!
     end
 
     def _inline_nesting(container, collection, attributes)
@@ -114,7 +129,7 @@ class Cbuilder < BlankSlate
     end
 
     def _evaluate_for(element, values)
-      values.map {|v| element.send(v)}
+      values.map { |value| element.send(value)}
     end
 
 end

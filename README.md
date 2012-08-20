@@ -11,26 +11,18 @@ cbuilder is here to make it easier.
 
 Have you ever found yourself doing this?
 
-    Name,Products Purchased, 
+    Name,Products Purchased, Product Names 
     <% @orders.each do |order|%>
-    <%= order.customer.name %>,<%= products_count(order) %>,<%= customer_lastname(order) %>,...
+    <%= order.customer.name %>,<%= products_count(order) %>,<%= product_names(order.products) %>,...
     <% end %>
 
 What if you could do this instead?
-    Cbuilder.encode(@orders) do
-      "Customer Name"         name
-      "Products Purchased"    helper(products_count)
-      "Product Names"         products :name
-      ...                     ...
-    end
-
-Or maybe Builder is more your style?
 
     Cbuilder.encode(@orders) do |csv|
-      csv.name
-      csv.column        "Products Purchased" helper(products_count)
-      csv.product_names products :name
-      ...
+      csv.column "Customer Name",      :name
+      csv.column "Products Purchased", products_count
+      csv.column "Product Names",      products :name
+      ...                     ...
     end
 
 ## Installation

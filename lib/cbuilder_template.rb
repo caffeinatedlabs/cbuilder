@@ -1,6 +1,6 @@
 class CbuilderTemplate < Cbuilder
   def self.encode(context)
-    new(context)._tap { |jbuilder| yield jbuilder }.target!
+    new(context)._tap { |cbuilder| yield cbuilder }.target!
   end
 
   def initialize(context)
