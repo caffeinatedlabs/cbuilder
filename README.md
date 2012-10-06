@@ -20,9 +20,9 @@ What if you could do this instead?
 
     Cbuilder.encode do |csv|
       csv.set_collection!(@orders) do |order|
-        csv.col 'Customer Name'        order.customer.name
-        csv.col 'Products Purchased'   products_count(order)
-        csv.col 'Product Names'        product_names(order.products)
+        csv.col 'Customer Name',        order.customer.name
+        csv.col 'Products Purchased',   products_count(order)
+        csv.col 'Product Names',        product_names(order.products)
       end
     end
 
