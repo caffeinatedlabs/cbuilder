@@ -17,7 +17,8 @@ class CbuilderTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal ["1138"], CSV.parse(csv)[0]
+    assert_equal ["Order Number"], CSV.parse(csv)[0]
+    assert_equal ["1138"], CSV.parse(csv)[1]
   end
 
   test "single col with nil value" do
@@ -28,7 +29,7 @@ class CbuilderTest < ActiveSupport::TestCase
     end
 
     assert CSV.parse(csv)[0] == ["Order Number"]
-    assert_equal [''], CSV.parse(csv)[1]
+    assert_equal [], CSV.parse(csv)[1]
   end
 
   test "multiple cols" do
@@ -40,8 +41,8 @@ class CbuilderTest < ActiveSupport::TestCase
     end
     
     CSV.parse(csv).tap do |parsed|
-      assert_equal ["1138", "Joe Schmo"], parsed[0]
-      assert_equal ["6875309", "Nate Berkopec"], parsed[1]
+      assert_equal ["1138", "Joe Schmo"], parsed[1]
+      assert_equal ["6875309", "Nate Berkopec"], parsed[2]
     end
   end
 

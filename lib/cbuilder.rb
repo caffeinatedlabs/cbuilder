@@ -13,10 +13,11 @@ class Cbuilder < ActiveSupport::BasicObject
   end
 
   def initialize
-    @attributes = ::Array.new
+    @attributes, @headers = ::Array.new, ::Array.new
   end
 
   def set!(column, value)
+    @headers.push column unless @headers.include?(column)
     @attributes.push value
   end
   alias_method :col, :set!
@@ -29,26 +30,21 @@ class Cbuilder < ActiveSupport::BasicObject
       collection
     end
   end
-
-  # Returns the attributes of the current builder.
-  def attributes!
-    @attributes
-  end
   
   # Encodes the current builder as CSV.
   def target!
     if ::RUBY_VERSION > '1.9'
       ::CSV.generate do |csv|
-        csv << @attributes.shift # pop header row
+        csv << @headers # header row
         @attributes.each do |element| # body rows
-          csv << element
+          csv << (element.nil? ? '' : element)
         end
       end
     else
       FasterCSV.generate do |csv|
-        csv << @attributes.shift # pop header row
+        csv << @headers # pop header row
         @attributes.each do |element| # body rows
-          csv << element.nil? ? '' : element
+          csv << (element.nil? ? '' : element)
         end
       end
     end
