@@ -46,4 +46,26 @@ class CbuilderTest < ActiveSupport::TestCase
     end
   end
 
+  test "protects commas" do
+    orders = [Struct.new(:number, :name).new(1138, 'Joe, Schmo')]
+    csv = Cbuilder.encode do |csv|
+      csv.set_collection!(orders) do |order|
+        csv.col "Name", order.name
+      end
+    end
+
+    assert_equal ["Joe, Schmo"], CSV.parse(csv)[1]
+  end
+
+  test "escaping quotes" do
+    orders = [Struct.new(:number, :name).new(1138, %{"Joe Schmo"})]
+    csv = Cbuilder.encode do |csv|
+      csv.set_collection!(orders) do |order|
+        csv.col "Name", order.name
+      end
+    end
+
+    assert_equal [%{"Joe Schmo"}], CSV.parse(csv)[1]
+  end
+
 end
