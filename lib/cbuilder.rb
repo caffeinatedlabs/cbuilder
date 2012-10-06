@@ -1,38 +1,33 @@
-require 'blankslate'
+require 'active_support/basic_object'
 require 'active_support/ordered_hash'
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/enumerable'
 require 'csv'
 
-class Cbuilder < BlankSlate
+class Cbuilder < ActiveSupport::BasicObject
   #Yields a builder and automatically turns the result into a CSV file
-  def self.encode(collection = nil)
-    new._tap { |cbuilder| yield cbuilder }.target!(collection)
+  def self.encode(*args)
+    cbuilder = new(*args)
+    yield cbuilder
+    cbuilder.target!
   end
-
-  define_method(:__class__, find_hidden_method(:class))
-  define_method(:_tap, find_hidden_method(:tap))
 
   def initialize
-    @attributes = ActiveSupport::OrderedHash.new
+    @attributes = ::Array.new
   end
 
-  # Dynamically set a column/value pair. 
-  # Example: 
-  # csv.set!(:username, :name)
-  # csv.set!(:password)
-  # username,password
-  # user,secret
   def set!(column, value)
-    @attributes[column] = value
+    @attributes.push value
   end
+  alias_method :col, :set!
 
-  # sugary set method
-  # csv.column 'User Age' :age
-  # User Age, ...
-  # 32
-  def column(column, value)
-    set! column, value
+  def set_collection!(collection)
+    @collection = collection
+    @attributes = if ::Kernel::block_given?
+      _map_collection(collection) { |element| if ::Proc.new.arity == 2 then yield self, element else yield element end }
+    else
+      collection
+    end
   end
 
   # Returns the attributes of the current builder.
@@ -41,95 +36,42 @@ class Cbuilder < BlankSlate
   end
   
   # Encodes the current builder as CSV.
-  def target!(collection = nil)
-    if RUBY_VERSION > '1.9'
-      CSV.generate do |csv|
-        csv << @attributes.keys # header row
-        if collection.nil?
-          csv << @attributes.values # body rows
-        else
-          collection.each do |element| # body rows
-            csv << _evaluate_for(element, @attributes.values)
-          end
+  def target!
+    if ::RUBY_VERSION > '1.9'
+      ::CSV.generate do |csv|
+        csv << @attributes.shift # pop header row
+        @attributes.each do |element| # body rows
+          csv << element
         end
       end
     else
       FasterCSV.generate do |csv|
-        csv << @attributes.keys
-        csv << @attributes.values
+        csv << @attributes.shift # pop header row
+        @attributes.each do |element| # body rows
+          csv << element.nil? ? '' : element
+        end
       end
     end
   end
 
   private
-    def method_missing(method, *args)
-      case
-      # csv.age 32
-      # age, ...
-      # 32, ...
-      when args.length == 1
-        set! method, args.first 
-
-      # person = {:age => 32}
-      # csv.age
-      # age, ...
-      # 32, ...
-      when args.length == 0
-        set! method, method
-
-      # csv.comments { |csv| ... }
-      # comments, ...
-      # " ... ", ...
-      when args.empty? && block_given?
-        # todo: implement
-      
-      # csv.comments @post.comments, :content
-      # comments, ...
-      # "hello, world", ...
-      when args.length == 2 && args.first.is_a?(Enumerable)
-        set! method, args.first.map {|a| a.send(args[1])}.join(", ")
-
-      end
-    end
-
-    # Overwrite in subclasses if you need to add initialization values
-    # These methods stolen wholesale from the excellent jbuilder
-    def _new_instance
-      __class__.new
-    end
-
-    def _yield_nesting(container)
-      set! container, _new_instance._tap { |cbuilder| yield cbuilder }.attributes!
-    end
-
-    def _inline_nesting(container, collection, attributes)
-      __send__(container) do |parent|
-        parent.array!(collection) and return if collection.empty?
-        
-        collection.each do |element|
-          parent.child! do |child|
-            attributes.each do |attribute|
-              child.__send__ attribute, element.send(attribute)
-            end
-          end
-        end
-      end
-    end
-    
-    def _yield_iteration(container, collection)
-      __send__(container) do |parent|
-        parent.array!(collection) do |child, element|
-          yield child, element
-        end
-      end
-    end
-    
-    def _inline_extract(container, record, attributes)
-      __send__(container) { |parent| parent.extract! record, *attributes }
-    end
-
     def _evaluate_for(element, values)
       values.map { |value| element.send(value)}
+    end
+
+    def _map_collection(collection)
+      collection.each.map do |element|
+        _scope { yield element }
+      end
+    end
+
+    def _scope
+      parent_attributes = @attributes
+      @attributes = ::Array.new
+      yield
+      @attributes
+    ensure
+      @attributes= parent_attributes
     end
 
 end

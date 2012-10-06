@@ -1,11 +1,7 @@
 class CbuilderTemplate < Cbuilder
-  def self.encode(context)
-    new(context)._tap { |cbuilder| yield cbuilder }.target!
-  end
-
-  def initialize(context)
+  def initialize(context, *args)
     @context = context
-    super()
+    super(*args)
   end
 
   def partial!(options, locals = {})
@@ -13,16 +9,11 @@ class CbuilderTemplate < Cbuilder
     when Hash
       options[:locals] ||= {}
       options[:locals].merge!(:csv => self)
-      @context.render(options)
+      @context.render(options.reverse_merge(:formats => [:csv]))
     else
-      @context.render(options, locals.merge(:csv => self))
+      @context.render(:partial => options, :locals => locals.merge(:csv => self), :formats => [:csv])
     end
   end
-
-  private
-    def _new_instance
-      __class__.new(@context)
-    end
 end
 
 class CbuilderHandler
@@ -30,15 +21,8 @@ class CbuilderHandler
   self.default_format = Mime::CSV
 
   def self.call(template)
-    %{
-      if defined?(csv)
-        #{template.source}
-      else
-        CbuilderTemplate.encode(self) do |csv|
-          #{template.source}
-        end
-      end
-    }
+    %{__already_defined = defined?(csv); csv||=CbuilderTemplate.new(self); #{template.source}
+      csv.target! unless __already_defined}
   end
 end
 
