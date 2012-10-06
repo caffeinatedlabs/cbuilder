@@ -1,5 +1,4 @@
 require 'active_support/basic_object'
-require 'active_support/ordered_hash'
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/enumerable'
 require 'csv'
