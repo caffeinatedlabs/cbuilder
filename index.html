@@ -1,1 +1,64 @@
-My GitHub Page
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cbuilder - lightweight csv templating</title>
+    <script type="text/javascript" src="//use.typekit.net/dry3slz.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <a href="https://github.com/caffeinatedlabs/cbuilder"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+    <div class="container">
+      <div class="row">
+        <div class="hero-unit">
+          <h1>Cbuilder</h1>
+          <p>lightweight csv templating</p>
+        </div>
+      <div class="row narrow">
+        <div id="readme">
+<pre>
+  Cbuilder.encode do |csv|
+    csv.set_collection!(@orders) do |order|
+      csv.col 'Customer Name',        order.customer.name
+      csv.col 'Products Purchased',   products_count(order)
+      csv.col 'Product Names',        names(order.products)
+    end
+  end
+</pre>
+
+          <p>
+          Cbuilder is an ultralight (< 100 LOC) CSV builder/template handler inspired by dhh's excellent Jbuilder. The goal is a simple DSL for creating CSV files that's better than creating massive custom arrays.
+          </p>
+          <p>
+          If you're doing any more than 4-5 columns, generating CSV files can be a real pain. God forbid you're not simply outputting the attributes of a simple array, and need helpers or other niceties.
+          </p>
+          <p>
+          You don't need to re-invent the wheel with CSV. Cbuilder weighs in at less than 100 LOC.
+          </p>
+
+          <h2>Usage</h2>
+          <p>
+          Just drop into your Rails Gemfile and start adding templates with *.csv.cbuilder.
+          </p>
+          <p>
+          If you'd like the CSV to be downloaded as an attachment, add the following to your controller action:
+          </p>
+<pre>
+response.headers["Content-Disposition"] =
+  'attachment; filename="my_spreadsheet.csv'
+</pre>
+          
+          <p>
+          Cbuilder was lovingly coded in small batches with an artisanal eye by <a href="http://craftcoffee.com">Craft Coffee.</a>
+          </p>
+
+          <p>
+            <a href="http://github.com/caffeinatedlabs/craftcoffee" class="btn btn-success btn-large btn-block">Take me to the repo!</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+h1 {
+  font-size: 13em !important;
+}
+.hero-unit p {
+  font-size: 4em !important;
+  margin: 0;
+  font-weight: 600;
+}
+
+body {
+  background-image: url('http://th07.deviantart.net/fs8/PRE/i/2005/321/6/a/Wood_by_Breyer_Stock.jpg');
+}
+
+.hero-unit {
+  background: rgba(230,230,230,0);
+  color: rgba(255,255,255,.95);
+  text-align: center;
+  margin: 0;
+}
+
+.hero-unit h1 {
+  margin: 0;
+}
+
+.narrow {
+  width: 550px;
+  margin: 0 auto;
+}
+
+#readme {
+  background: white;
+  padding: 45px;
+  margin-bottom: 100px;
+}
+
+#readme p {
+  line-height: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+pre {
+  font-size: 12px !important;
+  margin-bottom: 24px;
+  padding: 10px;
+}
