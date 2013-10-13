@@ -6,9 +6,12 @@ rescue LoadError
   CbuilderProxy = ActiveSupport::BasicObject
 end
 
+require 'csv'
+CbuilderCSVProxy = ::RUBY_VERSION > '1.9' ? CSV : FasterCSV
+
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/enumerable'
-require 'csv'
+
 
 class Cbuilder < CbuilderProxy
   #Yields a builder and automatically turns the result into a CSV file
@@ -39,19 +42,10 @@ class Cbuilder < CbuilderProxy
 
   # Encodes the current builder as CSV.
   def target!
-    if ::RUBY_VERSION > '1.9'
-      ::CSV.generate do |csv|
-        csv << @headers # header row
-        @attributes.each do |element| # body rows
-          csv << (element.nil? ? '' : element)
-        end
-      end
-    else
-      FasterCSV.generate do |csv|
-        csv << @headers # pop header row
-        @attributes.each do |element| # body rows
-          csv << (element.nil? ? '' : element)
-        end
+    ::CbuilderCSVProxy.generate do |csv|
+      csv << @headers # header row
+      @attributes.each do |element| # body rows
+        csv << (element.nil? ? '' : element)
       end
     end
   end
