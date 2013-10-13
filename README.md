@@ -1,10 +1,12 @@
 # cbuilder
 
+[![Build Status](https://travis-ci.org/caffeinatedlabs/cbuilder.png?branch=master)](https://travis-ci.org/caffeinatedlabs/cbuilder)
+
 Cbuilder is an ultralight (< 100 LOC) CSV builder/template handler inspired by dhh's excellent
 Jbuilder. The goal is a simple DSL for creating CSV files that's better than creating
 massive custom arrays.
 
-If you're doing any more than 4-5 columns, generating CSV files can be a real pain. 
+If you're doing any more than 4-5 columns, generating CSV files can be a real pain.
 God forbid you're not simply outputting the attributes of a simple array, and need
 helpers or other niceties.
 
@@ -13,7 +15,7 @@ You don't need to re-invent the wheel with CSV. Cbuilder weighs in at less than 
 Have you ever found yourself doing this?
 
 ```ruby
-  Customer Name,Products Purchased, Product Names 
+  Customer Name,Products Purchased, Product Names
   <% @orders.each do |order|%>
   <%= order.customer.name %>,<%= products_count(order) %>,<%= product_names(order.products) %>,...
   <% end %>
