@@ -1,9 +1,16 @@
-require 'active_support/basic_object'
+begin
+  require 'active_support/proxy_object'
+  CbuilderProxy = ActiveSupport::ProxyObject
+rescue LoadError
+  require 'active_support/basic_object'
+  CbuilderProxy = ActiveSupport::BasicObject
+end
+
 require 'active_support/core_ext/array/access'
 require 'active_support/core_ext/enumerable'
 require 'csv'
 
-class Cbuilder < ActiveSupport::BasicObject
+class Cbuilder < CbuilderProxy
   #Yields a builder and automatically turns the result into a CSV file
   def self.encode(*args)
     cbuilder = new(*args)
@@ -29,7 +36,7 @@ class Cbuilder < ActiveSupport::BasicObject
       collection
     end
   end
-  
+
   # Encodes the current builder as CSV.
   def target!
     if ::RUBY_VERSION > '1.9'
