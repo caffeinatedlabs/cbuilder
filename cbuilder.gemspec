@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = "cbuilder"
-  gem.version       = "0.0.1"
+  gem.version       = "0.0.2"
   gem.authors       = ["Nate Berkopec"]
   gem.email         = ["nate.berkopec@gmail.com"]
   gem.summary       = "Create CSV structures with a Builder-style DSL"
