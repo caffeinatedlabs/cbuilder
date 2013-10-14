@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Nate Berkopec"]
   gem.email         = ["nate.berkopec@gmail.com"]
   gem.summary       = "Create CSV structures with a Builder-style DSL"
-  gem.homepage      = "http://github.com/nateberkopec/cbuilder"
+  gem.homepage      = "http://github.com/caffeinatedlabs/cbuilder"
 
   gem.add_dependency 'rake'
   gem.add_dependency 'activesupport', '>= 3.0.0'
